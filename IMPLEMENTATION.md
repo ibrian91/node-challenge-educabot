@@ -15,6 +15,20 @@ Se ha implementado exitosamente el **BooksProvider HTTP** siguiendo las buenas p
 - `src/config/providers.ts` - Configuración centralizada para providers
 - `src/factories/booksProviderFactory.ts` - Factory pattern para instanciar providers
 
+### 2. Separación de Lógica de Negocio y Presentación ✨ NUEVO
+
+**Archivos creados/modificados:**
+- `src/services/metricsService.ts` - **NUEVO** - Lógica de negocio separada
+- `src/handlers/metrics.ts` - **REFACTORIZADO** - Solo maneja presentación/HTTP
+- `src/index.ts` - Actualizado para usar el nuevo servicio
+
+**Beneficios de la separación:**
+- ✅ **Lógica de negocio** en `MetricsService` (cálculos, transformaciones)
+- ✅ **Lógica de presentación** en handler (HTTP, request/response)
+- ✅ **Testabilidad mejorada** - lógica de negocio independiente de HTTP
+- ✅ **Reutilización** - el servicio puede usarse en otros contextos
+- ✅ **Mantenibilidad** - responsabilidades claramente separadas
+
 **Características implementadas:**
 - ✅ Solicitudes HTTP con axios
 - ✅ Manejo robusto de errores con try-catch
@@ -33,8 +47,9 @@ Se ha implementado exitosamente el **BooksProvider HTTP** siguiendo las buenas p
 
 **Archivos de test creados:**
 - `src/test/httpBooksProvider.test.ts` - Tests del provider HTTP
+- `src/test/metricsService.test.ts` - **NUEVO** - Tests de la lógica de negocio
 - `src/factories/booksProviderFactory.test.ts` - Tests del factory
-- `src/handlers/metrics.test.ts` - Tests actualizados del handler
+- `src/handlers/metrics.test.ts` - Tests actualizados del handler (solo presentación)
 
 **Casos de test cubiertos:**
 - ✅ Respuesta exitosa de la API
@@ -62,10 +77,13 @@ src/
 ├── repositories/
 │   └── mocks/
 │       └── booksProvider.ts  # Provider mock (actualizado)
+├── services/                 # ✨ NUEVA CAPA
+│   └── metricsService.ts     # Lógica de negocio
 ├── test/
-│   └── httpBooksProvider.test.ts # Tests del provider HTTP
+│   ├── httpBooksProvider.test.ts # Tests del provider HTTP
+│   └── metricsService.test.ts    # Tests de lógica de negocio
 └── handlers/
-    └── metrics.ts            # Handler actualizado con manejo de errores
+    └── metrics.ts            # Handler (solo presentación)
 ```
 
 ## 🔧 Configuración
@@ -106,13 +124,14 @@ export const PROVIDER_CONFIG = {
 ## 📊 Resultados de Tests
 
 ```
-✅ Test Files  3 passed (3)
-✅ Tests      13 passed (13)
+✅ Test Files  4 passed (4)
+✅ Tests      20 passed (20)
 ```
 
 **Cobertura de tests:**
 - HttpBooksProvider: 7 tests
-- MetricsHandler: 5 tests  
+- **MetricsService: 8 tests** ✨ NUEVO
+- MetricsHandler: 4 tests (refactorizado)
 - BooksProviderFactory: 1 test
 
 ## 🌐 API Externa
@@ -152,8 +171,9 @@ export const PROVIDER_CONFIG = {
 
 Las bases están implementadas para continuar con las siguientes tareas del challenge:
 
-2. ✏️ **Separación de capas:** Lógica de negocio vs presentación
-3. 🔧 **Eliminación de tipos `any`:** Tipado específico para MetricsResponse
-4. 🧪 **Ampliación de tests:** Cobertura adicional según cambios de arquitectura
+1. ✅ **BooksProvider HTTP:** Implementado exitosamente
+2. ✅ **Separación de capas:** Lógica de negocio vs presentación - **COMPLETADO**
+3. 🔧 **Eliminación de tipos `any`:** Tipado específico para MetricsResponse - **EN PROGRESO**
+4. 🧪 **Ampliación de tests:** Cobertura adicional según cambios de arquitectura - **COMPLETADO**
 
 La implementación actual sigue las mejores prácticas de desarrollo y proporciona una base sólida para futuras mejoras.

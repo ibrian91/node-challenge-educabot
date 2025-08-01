@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import { createBooksProvider } from './factories/booksProviderFactory.ts'
+import { MetricsService } from './services/metricsService.ts'
 import MetricsHandler from './handlers/metrics.ts'
 
 const app = express()
@@ -10,7 +11,8 @@ app.use(express.json())
 app.use(cors())
 
 const booksProvider = createBooksProvider()
-const metricsHandler = MetricsHandler(booksProvider)
+const metricsService = new MetricsService(booksProvider)
+const metricsHandler = MetricsHandler(metricsService)
 app.get('/', metricsHandler.get)
 
 app.listen(PORT, () => {
