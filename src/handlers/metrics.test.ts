@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, Mock } from 'vitest'
 import metricsHandler from './metrics'
 import { Request, Response } from 'express'
-import { MetricsService } from '../services/metricsService.ts'
+import { MetricsService, BookMetrics } from '../services/metricsService.ts'
 import { Book } from '../models/book'
 
 describe('metricsHandler', () => {
@@ -13,9 +13,10 @@ describe('metricsHandler', () => {
   ]
 
   // Mock MetricsService
-  const mockMetricsService: MetricsService = {
-    getBookMetrics: vi.fn()
-  } as any
+  const mockGetBookMetrics = vi.fn<[string?], Promise<BookMetrics>>()
+  const mockMetricsService = {
+    getBookMetrics: mockGetBookMetrics
+  } as unknown as MetricsService
 
   // Set up handler with mock service
   const handler = metricsHandler(mockMetricsService)
@@ -23,7 +24,7 @@ describe('metricsHandler', () => {
   // Mock request and response
   let mockReq: Partial<Request>
   let mockRes: Partial<Response>
-  let jsonMock: any
+  let jsonMock: Mock
 
   beforeEach(() => {
     jsonMock = vi.fn()
@@ -45,11 +46,11 @@ describe('metricsHandler', () => {
         booksWrittenByAuthor: []
       }
       
-      ;(mockMetricsService.getBookMetrics as any).mockResolvedValue(mockMetrics)
+      mockGetBookMetrics.mockResolvedValue(mockMetrics)
 
-      await handler.get(mockReq as any, mockRes as any)
+      await handler.get(mockReq as Request, mockRes as Response)
 
-      expect(mockMetricsService.getBookMetrics).toHaveBeenCalledWith(undefined)
+      expect(mockGetBookMetrics).toHaveBeenCalledWith(undefined)
       expect(mockRes.status).toHaveBeenCalledWith(200)
       expect(jsonMock).toHaveBeenCalledWith({
         mean_units_sold: 200,
@@ -67,11 +68,11 @@ describe('metricsHandler', () => {
         booksWrittenByAuthor: [mockBooks[0], mockBooks[2]]
       }
       
-      ;(mockMetricsService.getBookMetrics as any).mockResolvedValue(mockMetrics)
+      mockGetBookMetrics.mockResolvedValue(mockMetrics)
 
-      await handler.get(mockReq as any, mockRes as any)
+      await handler.get(mockReq as Request, mockRes as Response)
 
-      expect(mockMetricsService.getBookMetrics).toHaveBeenCalledWith('Author 1')
+      expect(mockGetBookMetrics).toHaveBeenCalledWith('Author 1')
       expect(mockRes.status).toHaveBeenCalledWith(200)
       expect(jsonMock).toHaveBeenCalledWith({
         mean_units_sold: 200,
@@ -81,9 +82,9 @@ describe('metricsHandler', () => {
     })
 
     it('should handle service error gracefully', async () => {
-      ;(mockMetricsService.getBookMetrics as any).mockRejectedValue(new Error('Service Error'))
+      mockGetBookMetrics.mockRejectedValue(new Error('Service Error'))
 
-      await handler.get(mockReq as any, mockRes as any)
+      await handler.get(mockReq as Request, mockRes as Response)
 
       expect(mockRes.status).toHaveBeenCalledWith(500)
       expect(jsonMock).toHaveBeenCalledWith({
@@ -99,9 +100,9 @@ describe('metricsHandler', () => {
         booksWrittenByAuthor: []
       }
       
-      ;(mockMetricsService.getBookMetrics as any).mockResolvedValue(mockMetrics)
+      mockGetBookMetrics.mockResolvedValue(mockMetrics)
 
-      await handler.get(mockReq as any, mockRes as any)
+      await handler.get(mockReq as Request, mockRes as Response)
 
       expect(mockRes.status).toHaveBeenCalledWith(200)
       expect(jsonMock).toHaveBeenCalledWith({

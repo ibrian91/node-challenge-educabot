@@ -1,11 +1,16 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest'
 import axios from 'axios'
 import httpBooksProvider from '../providers/httpBooksProvider.ts'
 import { BookApiResponse } from '../models/book.ts'
 
 // Mock axios
 vi.mock('axios')
-const mockedAxios = axios as any
+
+interface MockedAxios {
+  get: Mock<[string, object?], Promise<{ data: BookApiResponse[] }>>
+}
+
+const mockedAxios = axios as unknown as MockedAxios
 
 describe('HttpBooksProvider', () => {
   let provider: ReturnType<typeof httpBooksProvider>
@@ -39,7 +44,7 @@ describe('HttpBooksProvider', () => {
         }
       ]
 
-      mockedAxios.get = vi.fn().mockResolvedValueOnce({
+      mockedAxios.get.mockResolvedValueOnce({
         data: mockApiResponse
       })
 
@@ -70,7 +75,7 @@ describe('HttpBooksProvider', () => {
 
     it('should handle empty response', async () => {
       // Arrange
-      mockedAxios.get = vi.fn().mockResolvedValueOnce({
+      mockedAxios.get.mockResolvedValueOnce({
         data: []
       })
 
@@ -84,7 +89,7 @@ describe('HttpBooksProvider', () => {
     it('should throw error when API request fails', async () => {
       // Arrange
       const errorMessage = 'Network Error'
-      mockedAxios.get = vi.fn().mockRejectedValueOnce(new Error(errorMessage))
+      mockedAxios.get.mockRejectedValueOnce(new Error(errorMessage))
 
       // Act & Assert
       await expect(provider.getBooks()).rejects.toThrow('Failed to fetch books from external service')
@@ -92,7 +97,7 @@ describe('HttpBooksProvider', () => {
 
     it('should handle API timeout error', async () => {
       // Arrange
-      mockedAxios.get = vi.fn().mockRejectedValueOnce({
+      mockedAxios.get.mockRejectedValueOnce({
         code: 'ECONNABORTED',
         message: 'timeout of 5000ms exceeded'
       })
@@ -103,7 +108,7 @@ describe('HttpBooksProvider', () => {
 
     it('should handle 404 error from API', async () => {
       // Arrange
-      mockedAxios.get = vi.fn().mockRejectedValueOnce({
+      mockedAxios.get.mockRejectedValueOnce({
         response: {
           status: 404,
           data: { message: 'Not Found' }
@@ -116,7 +121,7 @@ describe('HttpBooksProvider', () => {
 
     it('should handle 500 error from API', async () => {
       // Arrange
-      mockedAxios.get = vi.fn().mockRejectedValueOnce({
+      mockedAxios.get.mockRejectedValueOnce({
         response: {
           status: 500,
           data: { message: 'Internal Server Error' }
@@ -139,7 +144,7 @@ describe('HttpBooksProvider', () => {
         }
       ]
 
-      mockedAxios.get = vi.fn().mockResolvedValueOnce({
+      mockedAxios.get.mockResolvedValueOnce({
         data: mockApiResponse
       })
 

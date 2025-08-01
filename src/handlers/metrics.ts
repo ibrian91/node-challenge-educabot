@@ -1,35 +1,34 @@
 import { Request, Response } from 'express'
 import { MetricsService } from '../services/metricsService.ts'
+import { MetricsResponse, ErrorResponse } from '../models/responses.ts'
 
 interface GetMetricsQuery {
   author?: string
 }
 
-// Interface para la respuesta de la API
-interface MetricsResponse {
-  mean_units_sold: number
-  cheapest_book: any
-  books_written_by_author: any[]
-}
-
 const metricsHandler = (metricsService: MetricsService) => {
 
-  const get = async (req: Request<{}, {}, {}, GetMetricsQuery>, res: Response<MetricsResponse>) => {
+  const get = async (req: Request<{}, {}, {}, GetMetricsQuery>, res: Response<MetricsResponse | ErrorResponse>) => {
     try {
       const { author } = req.query
       const metrics = await metricsService.getBookMetrics(author)
 
-      res.status(200).json({
+      const response: MetricsResponse = {
         mean_units_sold: metrics.meanUnitsSold,
         cheapest_book: metrics.cheapestBook,
         books_written_by_author: metrics.booksWrittenByAuthor,
-      })
+      }
+
+      res.status(200).json(response)
     } catch (error) {
       console.error('Error processing metrics request:', error)
-      res.status(500).json({
+      
+      const errorResponse: ErrorResponse = {
         error: 'Internal server error',
         message: 'Unable to fetch book metrics'
-      } as any)
+      }
+      
+      res.status(500).json(errorResponse)
     }
   }
 

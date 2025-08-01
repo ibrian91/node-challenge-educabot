@@ -15,19 +15,20 @@ Se ha implementado exitosamente el **BooksProvider HTTP** siguiendo las buenas p
 - `src/config/providers.ts` - Configuración centralizada para providers
 - `src/factories/booksProviderFactory.ts` - Factory pattern para instanciar providers
 
-### 2. Separación de Lógica de Negocio y Presentación ✨ NUEVO
+### 3. Eliminación de Tipos `any` y Tipado Fuerte ✨ COMPLETADO
 
 **Archivos creados/modificados:**
-- `src/services/metricsService.ts` - **NUEVO** - Lógica de negocio separada
-- `src/handlers/metrics.ts` - **REFACTORIZADO** - Solo maneja presentación/HTTP
-- `src/index.ts` - Actualizado para usar el nuevo servicio
+- `src/models/responses.ts` - **NUEVO** - Interfaces específicas para respuestas HTTP
+- `src/handlers/metrics.ts` - **REFACTORIZADO** - Eliminados todos los `any`
+- `src/test/responses.test.ts` - **NUEVO** - Tests para validar tipos de respuesta
+- Tests actualizados - **REFACTORIZADOS** - Mocks tipados correctamente
 
-**Beneficios de la separación:**
-- ✅ **Lógica de negocio** en `MetricsService` (cálculos, transformaciones)
-- ✅ **Lógica de presentación** en handler (HTTP, request/response)
-- ✅ **Testabilidad mejorada** - lógica de negocio independiente de HTTP
-- ✅ **Reutilización** - el servicio puede usarse en otros contextos
-- ✅ **Mantenibilidad** - responsabilidades claramente separadas
+**Tipos específicos implementados:**
+- ✅ **`MetricsResponse`** - Respuesta de métricas con tipos específicos
+- ✅ **`ErrorResponse`** - Respuesta de errores estructurada  
+- ✅ **`ApiResponse`** - Union type para todas las respuestas HTTP
+- ✅ **Mocks tipados** - Tests con tipos específicos en lugar de `any`
+- ✅ **Eliminación completa** - Cero usos de `any` en todo el código
 
 **Características implementadas:**
 - ✅ Solicitudes HTTP con axios
@@ -47,9 +48,10 @@ Se ha implementado exitosamente el **BooksProvider HTTP** siguiendo las buenas p
 
 **Archivos de test creados:**
 - `src/test/httpBooksProvider.test.ts` - Tests del provider HTTP
-- `src/test/metricsService.test.ts` - **NUEVO** - Tests de la lógica de negocio
+- `src/test/metricsService.test.ts` - Tests de la lógica de negocio
+- `src/test/responses.test.ts` - **NUEVO** - Tests de tipos de respuesta
 - `src/factories/booksProviderFactory.test.ts` - Tests del factory
-- `src/handlers/metrics.test.ts` - Tests actualizados del handler (solo presentación)
+- `src/handlers/metrics.test.ts` - Tests del handler (refactorizados con tipos específicos)
 
 **Casos de test cubiertos:**
 - ✅ Respuesta exitosa de la API
@@ -70,18 +72,20 @@ src/
 ├── factories/
 │   └── booksProviderFactory.ts # Factory pattern para providers
 ├── models/
-│   └── book.ts               # Interfaces de dominio y API
+│   ├── book.ts               # Interfaces de dominio y API
+│   └── responses.ts          # ✨ NUEVO - Tipos de respuesta HTTP
 ├── providers/
 │   ├── books.ts              # Interface del provider
 │   └── httpBooksProvider.ts  # Provider HTTP
 ├── repositories/
 │   └── mocks/
 │       └── booksProvider.ts  # Provider mock (actualizado)
-├── services/                 # ✨ NUEVA CAPA
+├── services/                 # Capa de lógica de negocio
 │   └── metricsService.ts     # Lógica de negocio
 ├── test/
 │   ├── httpBooksProvider.test.ts # Tests del provider HTTP
-│   └── metricsService.test.ts    # Tests de lógica de negocio
+│   ├── metricsService.test.ts    # Tests de lógica de negocio
+│   └── responses.test.ts         # ✨ NUEVO - Tests tipos respuesta
 └── handlers/
     └── metrics.ts            # Handler (solo presentación)
 ```
@@ -124,14 +128,15 @@ export const PROVIDER_CONFIG = {
 ## 📊 Resultados de Tests
 
 ```
-✅ Test Files  4 passed (4)
-✅ Tests      20 passed (20)
+✅ Test Files  5 passed (5)
+✅ Tests      25 passed (25)
 ```
 
 **Cobertura de tests:**
 - HttpBooksProvider: 7 tests
-- **MetricsService: 8 tests** ✨ NUEVO
+- MetricsService: 8 tests
 - MetricsHandler: 4 tests (refactorizado)
+- **ResponseTypes: 5 tests** ✨ NUEVO
 - BooksProviderFactory: 1 test
 
 ## 🌐 API Externa
