@@ -5,3 +5,12 @@ export interface Book {
   unitsSold: number
   price: number
 }
+
+// Interface para la respuesta de la API externa
+export interface BookApiResponse {
+  id: number
+  name: string
+  author: string
+  units_sold: number
+  price: number
+}

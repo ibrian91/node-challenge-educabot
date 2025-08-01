@@ -9,19 +9,26 @@ interface GetMetricsQuery {
 const metricsHandler = (metricsProvider: BooksProvider) => {
 
   const get = async (req: Request<{}, {}, {}, GetMetricsQuery>, res: Response<any>) => {
+    try {
+      const { author } = req.query
+      const books = await metricsProvider.getBooks()
 
-    const { author } = req.query
-    const books = metricsProvider.getBooks()
+      const meanUnitsSold = getMeanUnitsSold(books)
+      const cheapestBook = getCheapestBook(books)
+      const booksWrittenByAuthor = author ? getBooksWrittenByAuthor(books, author) : []
 
-    const meanUnitsSold = getMeanUnitsSold(books)
-    const cheapestBook = getCheapestBook(books)
-    const booksWrittenByAuthor = author ? getBooksWrittenByAuthor(books, author) : []
-
-    res.status(200).json({
-      mean_units_sold: meanUnitsSold,
-      cheapest_book: cheapestBook,
-      books_written_by_author: booksWrittenByAuthor,
-    })
+      res.status(200).json({
+        mean_units_sold: meanUnitsSold,
+        cheapest_book: cheapestBook,
+        books_written_by_author: booksWrittenByAuthor,
+      })
+    } catch (error) {
+      console.error('Error processing metrics request:', error)
+      res.status(500).json({
+        error: 'Internal server error',
+        message: 'Unable to fetch book metrics'
+      })
+    }
   }
 
   return {
